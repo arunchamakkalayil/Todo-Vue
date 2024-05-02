@@ -18,7 +18,7 @@
 import AddTodo from './components/AddTodo.vue'
 import TodoList from './components/TodoList.vue'
 import HeaderTodo from './components/Header.vue'
-import FooterTodo from './components/Footer.vue'
+
 
 export default {
   name: 'App',
@@ -26,7 +26,7 @@ export default {
     AddTodo,
     TodoList,
     HeaderTodo,
-    FooterTodo
+   
   },
   computed: {
     todos() {

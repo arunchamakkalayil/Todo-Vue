@@ -98,13 +98,25 @@
     <v-snackbar v-model="alert"  color="success" top right>
       Todo deleted successfully.
     </v-snackbar>
+    
+    <v-alert v-if="error" dense outlined type="error" class="validation-alert" colored-border>
+  <template #icon>
+    <v-icon color="error">mdi-alert-circle-outline</v-icon>
+  </template>
+  {{ error }}
+</v-alert>
 
- 
+<FooterTodo />
   </div>
 </template>
 
 <script>
+
+import FooterTodo from '../components/Footer.vue'
 export default {
+  components: {
+    FooterTodo, // Register the Footer component
+  },
   props: ['todos'],
   data() {
     return {
@@ -123,6 +135,7 @@ export default {
       editAlert: false, 
       search: '',
       selectedStatus: null,// eslint-disable-line
+      error: null, // Error message
     };
   },
   computed: {
@@ -162,16 +175,7 @@ export default {
       this.todoToDelete = todo; // Store the todo item to be deleted
       this.deleteDialog = true; // Open the delete confirmation dialog
     },
-    deleteTodo() {
-      if (this.todoToDelete) {
-        this.$store.dispatch('deleteTodo', this.todoToDelete.id); // Delete the todo
-        this.closeDeleteDialog(); // Close the delete confirmation dialog
-        this.alert = true; // Show the toast notification
-        setTimeout(()=>{
-          this.alert = false;
-        },2000)
-      }
-    },
+    
     closeDeleteDialog() {
       this.deleteDialog = false; // Close the delete confirmation dialog
       this.todoToDelete = null; // Reset the todo to delete
@@ -180,19 +184,39 @@ export default {
       this.editingTodo = { ...todo };
       this.editMode = true;
     },
-    saveEditedTodo() {
-      if (this.editingTodo) {
-        this.$store.dispatch('editTodo', this.editingTodo);
-        this.editMode = false;
-        this.editingTodo = null;
+    async saveEditedTodo() {
+      try {
+        if (this.editingTodo) {
+          await this.$store.dispatch('editTodo', this.editingTodo);
+          this.editMode = false;
+          this.editingTodo = null;
 
-        this.editAlert = true;
-        setTimeout(()=>{
-          this.editAlert = false;
-        },2000)
+          this.editAlert = true;
+          setTimeout(() => {
+            this.editAlert = false;
+          }, 2000);
 
-        // Close edit mode
-        this.cancelEdit();
+          // Close edit mode
+          this.cancelEdit();
+        }
+      } catch (error) {
+        this.error = 'An error occurred while saving the todo.'; // Set error message
+        console.error('Error saving todo:', error); // Log the error for debugging
+      }
+    },
+    async deleteTodo() {
+      try {
+        if (this.todoToDelete) {
+          await this.$store.dispatch('deleteTodo', this.todoToDelete.id); // Delete the todo
+          this.closeDeleteDialog(); // Close the delete confirmation dialog
+          this.alert = true; // Show the toast notification
+          setTimeout(() => {
+            this.alert = false;
+          }, 2000);
+        }
+      } catch (error) {
+        this.error = 'An error occurred while deleting the todo.'; // Set error message
+        console.error('Error deleting todo:', error); // Log the error for debugging
       }
     },
     cancelEdit() {

@@ -10,7 +10,5 @@
   };
   </script>
   
-  <style scoped>
-  /* Add any custom styles for the footer here */
-  </style>
+ 
   
